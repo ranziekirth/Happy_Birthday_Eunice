@@ -20,10 +20,10 @@ const MAIN_IMAGE = "assets/images/main photo.png";
 
 // 👉 YOUR 4 PHOTO-BOOTH STRIP PHOTOS, left to right.
 const BOOTH_IMAGES = [
-  "assets/images/image1.jpeg",
-  "assets/images/image2.jpg",
-  "assets/images/image3.jpeg",
-  "assets/images/image4.jpg",
+  "assets/images/Image1.jpeg",
+  "assets/images/Image2.jpg",
+  "assets/images/Image3.jpeg",
+  "assets/images/Image4.jpg",
 ];
 
 // 👉 Your "Happy Birthday" balloon graphic, shown above the main photo.
