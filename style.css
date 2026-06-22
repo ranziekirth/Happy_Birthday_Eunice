@@ -1,0 +1,493 @@
+/* ==========================================================================
+   DESIGN TOKENS
+   Change these variables to re-theme the whole site in one place.
+   ========================================================================== */
+:root {
+  --bg-light:     #FFE3F1;   /* light pink background */
+  --bg-light-2:   #FFD0E8;   /* gradient partner */
+  --pink:         #FF2D87;   /* vivid primary accent */
+  --pink-mid:     #FF6FA5;   /* balloons / confetti */
+  --pink-soft:    #FFC2DD;   /* soft highlights */
+  --gold:         #FFD166;   /* sparkle accent */
+  --lavender:     #B388EB;   /* confetti / balloon variety */
+  --cyan:         #5CE1E6;   /* confetti variety */
+  --cream:        #FFF8F0;   /* light text, used INSIDE the dark photo-booth strip */
+  --plum:         #3B1F3A;   /* photo-booth frame backing color */
+  --text-dark:    #6B2C57;   /* readable text on the light background */
+
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body:    'Quicksand', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* each "screen" is full-viewport; no page scrolling */
+  background: radial-gradient(ellipse at top, var(--bg-light-2), var(--bg-light) 70%);
+  font-family: var(--font-body);
+  color: var(--text-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced-motion still calms down the UI (button, countdown, strip reveal)
+     but leaves the falling balloons/confetti/sparkles alone. Without the
+     :not() exclusions, this !important rule overrides the per-piece
+     animationDuration that script.js sets in JS, so every piece finishes
+     in 0.01ms and jumps straight to its end position — i.e. balloons
+     "popping up" at the bottom instead of falling. */
+  *:not(.balloon):not(.confetti-piece):not(.sparkle),
+  *:not(.balloon):not(.confetti-piece):not(.sparkle)::before,
+  *:not(.balloon):not(.confetti-piece):not(.sparkle)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   SCREENS
+   Only one of these three sections is visible at a time.
+   script.js toggles the "is-active" class to switch scenes.
+   ========================================================================== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.screen.is-active {
+  display: flex;
+  opacity: 1;
+}
+
+.is-hidden { display: none !important; }
+
+/* ==========================================================================
+   SCENE 1 — COUNTDOWN
+   ========================================================================== */
+.title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  margin: 0 0 8px;
+  color: var(--text-dark);
+  text-shadow: 0 4px 18px rgba(255, 45, 135, 0.18);
+}
+
+.title span {
+  color: var(--pink);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  opacity: 0.8;
+  margin: 0 0 32px;
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--plum);
+  background: linear-gradient(135deg, var(--gold), var(--pink-soft));
+  border: none;
+  border-radius: 999px;
+  padding: 16px 36px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 45, 135, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(255, 45, 135, 0.4);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--pink);
+  outline-offset: 3px;
+}
+
+/* Big 5-4-3-2-1-0 number. The .pop class is added/removed by script.js
+   on every tick to replay the bounce animation each time the digit changes. */
+.countdown-number {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(6rem, 26vw, 10rem);
+  line-height: 1;
+  color: var(--pink);
+  text-shadow: 0 10px 30px rgba(255, 45, 135, 0.35);
+}
+
+.countdown-number.pop {
+  animation: pop-number 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop-number {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   SCENE 2 — PHOTO BOOTH STRIP
+   A horizontal 4-photo strip, styled like a real photo-booth print laid on
+   its side. Each frame pops in one after another (staggered animation-delay
+   per nth-child) with a quick camera-flash flicker over it, so the reveal
+   keeps moving instead of sitting there static. Once everything has popped
+   in, the whole strip gets a slow, gentle sway so it stays a little alive.
+   ========================================================================== */
+.photobooth-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.photobooth-strip {
+  display: flex;
+  gap: 10px;
+  background: var(--cream);
+  padding: 14px 14px 26px;
+  border-radius: 10px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.4);
+  /* Starts after the 4 frames have finished popping in (see delays below) */
+  animation: stripSway 5s ease-in-out 2.4s infinite;
+}
+
+.booth-frame {
+  position: relative;
+  width: min(20vw, 130px);
+  height: min(26vw, 168px);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--plum);
+  opacity: 0;
+  animation: boothPopIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Staggered entrance — frame 1, then 2, then 3, then 4 */
+.booth-frame:nth-child(1) { animation-delay: 0.15s; }
+.booth-frame:nth-child(2) { animation-delay: 0.65s; }
+.booth-frame:nth-child(3) { animation-delay: 1.15s; }
+.booth-frame:nth-child(4) { animation-delay: 1.65s; }
+
+.booth-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* White flash that flickers out right as each photo lands, like a camera */
+.booth-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  animation: boothFlash 0.5s ease-out forwards;
+}
+
+.booth-frame:nth-child(1) .booth-flash { animation-delay: 0.15s; }
+.booth-frame:nth-child(2) .booth-flash { animation-delay: 0.65s; }
+.booth-frame:nth-child(3) .booth-flash { animation-delay: 1.15s; }
+.booth-frame:nth-child(4) .booth-flash { animation-delay: 1.65s; }
+
+.photobooth-caption {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--text-dark);
+  margin: 0;
+  opacity: 0;
+  animation: captionFadeIn 0.8s ease forwards;
+  animation-delay: 2.2s;
+}
+
+@keyframes boothPopIn {
+  0%   { opacity: 0; transform: scale(0.55) translateY(34px) rotate(-7deg); }
+  65%  { opacity: 1; transform: scale(1.06) translateY(-5px) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); }
+}
+
+@keyframes boothFlash {
+  0%   { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+@keyframes stripSway {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50%      { transform: rotate(0.6deg); }
+}
+
+@keyframes captionFadeIn {
+  to { opacity: 1; }
+}
+
+/* This class is added right before switching to the gallery screen */
+.photobooth-stage.is-closing {
+  animation: boothFadeOut 0.7s ease forwards;
+}
+
+@keyframes boothFadeOut {
+  to { opacity: 0; transform: scale(0.88); }
+}
+
+/* ==========================================================================
+   SCENE 3 — FINAL GALLERY
+   ========================================================================== */
+
+/* Wraps the balloon banner + main photo as one centered group */
+.gallery-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Responsive gap: tighter on small screens */
+  gap: clamp(6px, 2vw, 14px);
+  /* Let it shrink on tiny screens without overflow */
+  max-width: 100%;
+  padding: 0 12px;
+}
+
+/* Hide the old <img> balloon banner — we inject a <div> instead */
+.balloon-banner {
+  display: none;
+}
+
+/* Balloon-letter text banner — fully fluid font size */
+.balloon-text-banner {
+  font-family: 'Boogaloo', 'Baloo 2', cursive;
+  /* clamp: min 1.6rem on tiny phones, scales with viewport, caps at 3.6rem on desktop */
+  font-size: clamp(1.6rem, 6.5vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-align: center;
+  white-space: nowrap;          /* keep it on one line */
+  max-width: 100%;
+  opacity: 0;
+  transform: translateY(-18px) scale(0.85);
+  animation: bannerDropIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.15s;
+}
+
+/* Each letter gets one of these classes for the balloon-rainbow effect */
+.balloon-text-banner .bl { display: inline-block; }
+.bl-1 { color: #FF2D87; text-shadow: 0 3px 0 #c0005f, 0 5px 10px rgba(255,45,135,0.3); }
+.bl-2 { color: #FF6FA5; text-shadow: 0 3px 0 #c0326a, 0 5px 10px rgba(255,111,165,0.3); }
+.bl-3 { color: #FFD166; text-shadow: 0 3px 0 #c09830, 0 5px 10px rgba(255,209,102,0.3); }
+.bl-4 { color: #B388EB; text-shadow: 0 3px 0 #7a50c4, 0 5px 10px rgba(179,136,235,0.3); }
+.bl-5 { color: #FF8FC7; text-shadow: 0 3px 0 #c04a88, 0 5px 10px rgba(255,143,199,0.3); }
+
+@keyframes bannerDropIn {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Main photo — fluid, fills available height nicely on all screen sizes */
+.main-photo {
+  /* Width: fills most of the viewport width on phones, capped on desktop */
+  width: min(100vw, 800px);
+  /* Height: never taller than ~55% of the viewport so the banner fits above */
+  max-height: 90vh;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: clamp(10px, 2vw, 18px);
+  cursor: pointer;            /* hint that it's clickable */
+  opacity: 0;
+  transform: scale(0.8);
+  animation: mainPhotoIn 1s ease forwards;
+  animation-delay: 0.2s;
+  /* Subtle tap feedback */
+  transition: transform 0.12s ease;
+}
+.main-photo:active {
+  transform: scale(0.96);
+}
+
+@keyframes mainPhotoIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Heart burst on photo click ---- */
+/* Each heart is a positioned <span> injected by script.js */
+.heart-burst {
+  position: fixed;           /* fixed so it escapes any overflow:hidden parent */
+  pointer-events: none;
+  font-size: 1.6rem;
+  z-index: 999;
+  animation: heartFly 1s ease-out forwards;
+  /* --dx and --dy are set inline per heart */
+}
+
+@keyframes heartFly {
+  0%   { opacity: 1; transform: translate(0, 0) scale(0.4); }
+  60%  { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(1.2); }
+  100% { opacity: 0; transform: translate(calc(var(--dx) * 1.4), calc(var(--dy) * 1.6)) scale(0.8); }
+}
+
+/* ---- Corner GIFs ---- */
+/* These sit fixed in the bottom corners of the screen, always on top */
+.corner-gif {
+  position: fixed;
+  bottom: 12px;
+  z-index: 10;
+  /* Responsive size: big enough to be fun, not so big it blocks the photo */
+  width: clamp(160px, 14vw, 110px);
+  /* GIFs typically have transparent BGs; no background needed */
+  pointer-events: none;  /* won't accidentally catch taps/clicks */
+}
+.corner-gif-left  { left: 12px; }
+.corner-gif-right { right: 12px; }
+.corner-gif-mid-right { right: 12px; top: 400px; z-index: -10; }
+.corner-gif-mid-left { left: 12px; top: 400px; z-index: -10; }
+.corner-gif-random1 { left: 50px; top: 650px; z-index: -10; }
+.corner-gif-random2 { right: 120px; top: 650px; z-index: -10; }
+/* Container the scattered photos live in. script.js positions each
+   photo with inline style (top/left/rotation), this just sets the
+   stacking context. */
+#scattered-gallery {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Each random photo gets this class from script.js. Polaroid-style frame. */
+.scatter-photo {
+  position: absolute;
+  width: 130px;
+  height: 160px;
+  object-fit: cover;
+  background: var(--cream);
+  padding: 8px 8px 24px;
+  border-radius: 4px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+  opacity: 0;
+  animation: scatterIn 0.7s ease forwards;
+}
+
+@keyframes scatterIn {
+  to { opacity: 1; }
+}
+
+/* ==========================================================================
+   AMBIENT BACKGROUND — balloons + confetti
+   script.js spawns one <div class="balloon"> or <div class="confetti-piece">
+   every so often; these just define what they look like and how they fall.
+   ========================================================================== */
+.decor-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* ---- Balloons ---- */
+.balloon {
+  position: absolute;
+  top: -130px;
+  width: 56px;
+  height: 70px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation-name: fall-balloon;
+  animation-duration: 10s; /* fallback — script.js overrides this per-balloon inline */
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+}
+
+.balloon::before { /* shine */
+  content: '';
+  position: absolute;
+  top: 14%;
+  left: 22%;
+  width: 30%;
+  height: 22%;
+  background: rgba(255,255,255,0.65);
+  border-radius: 50%;
+}
+
+.balloon::after { /* string */
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  width: 1.5px;
+  height: 26px;
+  background: rgba(120,60,90,0.35);
+}
+
+@keyframes fall-balloon {
+  0%   { transform: translateY(0)     translateX(0)                          rotate(0deg); }
+  25%  { transform: translateY(28vh)  translateX(calc(var(--drift) * 0.35))  rotate(calc(var(--spin) * 0.3)); }
+  50%  { transform: translateY(58vh)  translateX(calc(var(--drift) * -0.4))  rotate(calc(var(--spin) * -0.5)); }
+  75%  { transform: translateY(86vh)  translateX(calc(var(--drift) * 0.6))   rotate(calc(var(--spin) * 0.8)); }
+  100% { transform: translateY(118vh) translateX(var(--drift))               rotate(var(--spin)); }
+}
+
+/* ---- Confetti: comes in 3 shapes for variety ---- */
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 16px;
+  animation-name: fall-confetti;
+  animation-duration: 5s; /* fallback — script.js overrides this per-piece inline */
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+.confetti-piece.shape-circle {
+  border-radius: 50%;
+}
+
+.confetti-piece.shape-triangle {
+  background: transparent !important;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 14px solid var(--tri-color, var(--pink-mid));
+}
+
+@keyframes fall-confetti {
+  0%   { transform: translateY(0)     translateX(0)                          rotate(0deg);   opacity: 1; }
+  30%  { transform: translateY(35vh)  translateX(calc(var(--drift) * -0.5))  rotate(calc(var(--spin) * 0.4)); }
+  60%  { transform: translateY(70vh)  translateX(calc(var(--drift) * 0.7))   rotate(calc(var(--spin) * 0.7)); }
+  100% { transform: translateY(118vh) translateX(var(--drift))               rotate(var(--spin)); opacity: 0.85; }
+}
+
+/* ---- Twinkling sparkles: fixed in place, just pulse and fade ---- */
+.sparkle {
+  position: absolute;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation-name: sparkle-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes sparkle-twinkle {
+  0%   { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  50%  { opacity: 1; transform: scale(1)   rotate(160deg); }
+  100% { opacity: 0; transform: scale(0.2) rotate(320deg); }
+}
+
+/* Scene content always sits above the falling background */
+.screen, #scattered-gallery {
+  z-index: 1;
+}

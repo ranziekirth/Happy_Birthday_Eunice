@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday!</title>
+
+<!-- Display + body fonts. Loaded from Google Fonts when the page opens in a browser. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Boogaloo&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===================== AMBIENT BACKGROUND ===================== -->
+  <!-- Balloons and confetti pieces are created automatically by script.js -->
+  <!-- and dropped into these two containers. You don't add anything here by hand. -->
+  <div id="balloon-layer" class="decor-layer" aria-hidden="true"></div>
+  <div id="confetti-layer" class="decor-layer" aria-hidden="true"></div>
+
+  <!-- ===================== SCENE 1: COUNTDOWN ===================== -->
+  <section id="countdown-screen" class="screen is-active">
+    <h1 class="title">Happy BirthDay <span>Baby</span> 😘😚</h1>
+    <p class="subtitle">Wish You All The Best</p>
+
+    <button id="start-btn" class="btn">Ready</button>
+
+    <!-- Simple 5-4-3-2-1-0 countdown. script.js fills this number in. -->
+    <div id="countdown-number" class="countdown-number is-hidden">5</div>
+  </section>
+
+  <!-- ===================== SCENE 2: PHOTO BOOTH STRIP ===================== -->
+  <!-- A horizontal 4-photo strip, like a real photo-booth print laid on its side. -->
+  <!-- 👉 Put your 4 photo paths in BOOTH_IMAGES near the top of script.js. -->
+  <section id="booth-screen" class="screen">
+    <div class="photobooth-stage">
+      <div class="photobooth-strip" id="photobooth-strip">
+        <div class="booth-frame">
+          <img class="booth-img" id="booth-img-1" src="" alt="">
+          <div class="booth-flash"></div>
+        </div>
+        <div class="booth-frame">
+          <img class="booth-img" id="booth-img-2" src="" alt="">
+          <div class="booth-flash"></div>
+        </div>
+        <div class="booth-frame">
+          <img class="booth-img" id="booth-img-3" src="" alt="">
+          <div class="booth-flash"></div>
+        </div>
+        <div class="booth-frame">
+          <img class="booth-img" id="booth-img-4" src="" alt="">
+          <div class="booth-flash"></div>
+        </div>
+      </div>
+      <p class="photobooth-caption">Hehe I love youuu 🌺❤️❤️</p>
+    </div>
+  </section>
+
+  <!-- ===================== SCENE 3: FINAL GALLERY ===================== -->
+  <section id="gallery-screen" class="screen">
+
+    <!-- Balloon banner + main photo, centered together as one group -->
+    <div class="gallery-center">
+      <!-- The <img> below is hidden by CSS — script.js inserts the text banner instead -->
+      <img id="balloon-banner" src="" alt="" class="balloon-banner">
+      <img id="main-image" src="" alt="Main birthday photo" class="main-photo">
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 👉 YOUR SCATTERED / RANDOM PHOTOS GO HERE.                    -->
+    <!-- Leave this div empty — script.js fills it automatically       -->
+    <!-- from the GALLERY_IMAGES list at the top of script.js.         -->
+    <!-- ============================================================ -->
+    <div id="scattered-gallery"></div>
+
+    <!-- ============================================================ -->
+    <!-- 👉 CORNER GIFS                                                -->
+    <!-- Drop your .gif files into assets/images/ then set the src.   -->
+    <!-- Lower-right corner GIF (e.g. dancing cat):                   -->
+    <img class="corner-gif corner-gif-right" src="assets/images/scuba.gif" alt="">
+    <img class="corner-gif corner-gif-left" src="assets/images/dogs.gif" alt="">
+    <img class="corner-gif corner-gif-mid-right" src="assets/images/dancing.gif" alt="">
+    <img class="corner-gif corner-gif-mid-left" src="assets/images/partty.gif" alt="">
+    <img class="corner-gif corner-gif-random1" src="assets/images/gogo.gif" alt="">
+    <img class="corner-gif corner-gif-random2" src="assets/images/mwaw.gif" alt="">
+    <!-- Lower-left corner GIF — swap the src for a different one:    -->
+    <!-- <img class="corner-gif corner-gif-left" src="assets/images/your-gif-here.gif" alt=""> -->
+    <!-- ============================================================ -->
+
+  </section>
+
+  <!-- ===================== SOUND ===================== -->
+  <!-- Plays ONCE, narrating the full 5→0 count — see script.js section 3 -->
+  <audio id="tick-sound" src="assets/sounds/countdown.mp3" preload="auto"></audio>
+  <!-- Plays once, right when the countdown hits zero / the reveal begins -->
+  <audio id="reveal-sound" src="assets/sounds/happynabirthdaymopa.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>

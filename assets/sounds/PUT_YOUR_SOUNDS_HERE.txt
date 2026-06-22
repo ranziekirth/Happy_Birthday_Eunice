@@ -1,0 +1,22 @@
+Put two files in this folder, named exactly:
+
+  tick.mp3      -> plays once per second while the countdown is running
+  reveal.mp3    -> plays once, the moment the countdown hits zero / the book starts opening
+
+Where to get free sounds (no account needed for most):
+  - Mixkit:    https://mixkit.co/free-sound-effects/
+  - Pixabay:   https://pixabay.com/sound-effects/
+  - Zapsplat:  https://www.zapsplat.com (free account required)
+
+Good search terms:
+  - for tick.mp3:   "clock tick", "countdown beep"
+  - for reveal.mp3: "magic reveal", "sparkle whoosh", "ta-da", "page turn"
+
+Steps:
+  1. Download the mp3.
+  2. Rename it to tick.mp3 or reveal.mp3.
+  3. Drop it directly in this folder (assets/sounds/).
+  4. Reload index.html in your browser — no code changes needed,
+     script.js already points to these exact filenames.
+
+Delete this text file once you've added your real sounds (optional, it has no effect on the site).

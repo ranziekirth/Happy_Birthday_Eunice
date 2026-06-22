@@ -1,0 +1,23 @@
+Put your photos in this folder.
+
+1. MAIN PHOTO (shown inside the book, then centered on the final screen)
+   - Name it: main-photo.jpg
+   - (Any image works, just keep the name, or update MAIN_IMAGE in script.js
+      if you'd rather use a different filename.)
+
+2. SCATTERED / RANDOM PHOTOS (the extra photos scattered around the final screen)
+   - Name them anything you like, e.g. photo1.jpg, photo2.jpg, beach-trip.png ...
+   - Then list each filename inside script.js, in the GALLERY_IMAGES array
+     near the top of the file:
+
+       const GALLERY_IMAGES = [
+         "assets/images/photo1.jpg",
+         "assets/images/photo2.jpg",
+         "assets/images/beach-trip.png",
+       ];
+
+   - Add as many lines as you want — every line becomes one scattered photo.
+
+Supported formats: .jpg, .jpeg, .png, .webp, .gif
+
+Delete this text file once you've added your real photos (optional, it has no effect on the site).
