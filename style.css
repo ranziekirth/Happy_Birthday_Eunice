@@ -272,7 +272,7 @@ html, body {
 .balloon-text-banner {
   font-family: 'Boogaloo', 'Baloo 2', cursive;
   /* clamp: min 1.6rem on tiny phones, scales with viewport, caps at 3.6rem on desktop */
-  font-size: clamp(1.6rem, 6.5vw, 3.6rem);
+  font-size: clamp(2.6rem, 6.5vw, 3.6rem);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: 0.03em;
